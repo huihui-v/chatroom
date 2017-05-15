@@ -21,7 +21,14 @@ def test():
     string = "";
     try:
         s.bind((host, port))
-        string = s.resv()
+        s.listen(10)
+        print 'socket now listening'
+        conn, addr = s.accept()
+        print 'connected with ' + addr[0] + ':' + str(addr[1])
+
+        srting = conn.recv()
+        print string;
+        
     except socket.error, msg:
         print 'FAILED to bind port. Error code: ' + str(msg[0]) + ', Error message: ' + msg[1]
         sys.exit()
