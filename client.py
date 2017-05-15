@@ -17,10 +17,10 @@ def connectSocket():
     return s;
 
 def test():
-    socket = connectSocket();
+    s = connectSocket();
     string = 'teststring';
     try:
-        socket.connect((host, port))
+        s.connect((host, port))
         s.send(string)
     except socket.error, msg:
         print 'FAILED to create socket. Error code: ' + str(msg[0]) + ', Error message: ' + msg[1]

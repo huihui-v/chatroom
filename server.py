@@ -17,11 +17,11 @@ def connectSocket():
     return s;
 
 def test():
-    socket = connectSocket();
+    s = connectSocket();
     string = "";
     try:
-        socket.connect((host, port))
-        string = socket.resv()
+        s.connect((host, port))
+        string = s.resv()
     except socket.error, msg:
         print 'FAILED to create socket. Error code: ' + str(msg[0]) + ', Error message: ' + msg[1]
         sys.exit()
