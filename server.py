@@ -26,13 +26,12 @@ def test():
         conn, addr = s.accept()
         print 'connected with ' + addr[0] + ':' + str(addr[1])
 
-        srting = conn.recv()
+        srting = conn.recv(1024)
         print string;
         
     except socket.error, msg:
         print 'FAILED to bind port. Error code: ' + str(msg[0]) + ', Error message: ' + msg[1]
         sys.exit()
     print 'msg received'
-    print string;
 
 test();
