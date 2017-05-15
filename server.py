@@ -20,10 +20,10 @@ def test():
     s = connectSocket();
     string = "";
     try:
-        s.connect((host, port))
+        s.bind((host, port))
         string = s.resv()
     except socket.error, msg:
-        print 'FAILED to create socket. Error code: ' + str(msg[0]) + ', Error message: ' + msg[1]
+        print 'FAILED to bind port. Error code: ' + str(msg[0]) + ', Error message: ' + msg[1]
         sys.exit()
     print 'msg received'
     print string;
