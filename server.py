@@ -58,7 +58,7 @@ def handle_connection(conn, addr):
     while 1:
         recv_info = conn.recv(1024)
         recv_info = json.loads(recv_info)
-        if recv_info['status'] = 'SEND':
+        if recv_info['status'] == 'SEND':
             flag = 0
             for i in addrs:
                 if addrs[i][0] == recv_info['targetip']:
@@ -70,7 +70,7 @@ def handle_connection(conn, addr):
                     break;
             if flag == 0:
                 reply_offline(conn);
-        elif recv_info['status'] = 'DISCONNECT':
+        elif recv_info['status'] == 'DISCONNECT':
             for i in addrs:
                 if addrs[i][0] == addr[0]:
                     addrs.remove(i)
