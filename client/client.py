@@ -6,7 +6,7 @@ f = open("config.json", 'r')
 setting = json.load(f)
 host = setting['host']
 port = int(setting['port'])
-info = {"status": "", "info": "", "targetip": "", "body": ""}
+info = {"status": "", "info": "", "targetip": "", "targetport": "", "body": ""}
 
 def create_socket():
     try:
@@ -40,7 +40,9 @@ def disconnect(s):
 def send_msg(target, msg, s):
     new_info = info;
     new_info['status'] = "SEND"
-    new_info['targetip'] = target
+    new_info['targetip'] = target.split(':')[0]
+    if len(target.split(':')) == 2:
+        new_info['targetport'] = target.split(':')[1]
     new_info['info'] = msg
     in_json = json.dumps(new_info);
     s.sendall(in_json)
@@ -57,7 +59,7 @@ def listen (s):
         recv_info = s.recv(1024)
         recv_info = json.loads(recv_info);
         if recv_info['status'] == 'RECV':
-            print 'Receive from ', recv_info['sourceip'], ':'
+            print 'Receive from '+recv_info['sourceip']+':'+str(recv_info['sourceport'])+' :'
             print recv_info['info']
             continue;
         elif recv_info['status'] == 'RESP':
@@ -69,6 +71,9 @@ def listen (s):
             continue;
         elif recv_info['status'] == 'OFFLINE':
             print 'Error: Receiver Offline!'
+            continue;
+        elif recv_info['status'] == 'MULTITARGET':
+            print 'Error: There are more than one target, maybe you should add a port to the destination?'
             continue;
         elif recv_info['status'] == 'LOGIN':
             print recv_info['sourceip']+":"+str(recv_info['sourceport'])+" logged in!"

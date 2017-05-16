@@ -30,12 +30,14 @@ def bind_socket():
     print 'socket now listening'
     return s;
 
-def send_msg(conn, sourceip, msg):
+def send_msg(conn, source, msg):
     new_info = info
     new_info['status'] = "RECV"
     new_info['info'] = msg['info']
     new_info['targetip'] = msg['targetip']
-    new_info['sourceip'] = sourceip
+    new_info['targetport'] = msg['targetport']
+    new_info['sourceip'] = source[0]
+    new_info['sourceport'] = source[1]
     in_json = json.dumps(new_info)
     conn.sendall(in_json)
 
@@ -64,6 +66,12 @@ def reply_offline(conn):
     in_json = json.dumps(new_info)
     conn.sendall(in_json)
 
+def reply_multitarget(conn):
+    new_info = info
+    new_info['status'] = "MULTITARGET"
+    in_json = json.dumps(new_info)
+    conn.sendall(in_json)
+
 def push_notification(conn, addr, status):
     new_info = info
     new_info['status'] = status
@@ -83,17 +91,31 @@ def handle_connection(conn, addr):
         recv_info = conn.recv(1024)
         recv_info = json.loads(recv_info)
         if recv_info['status'] == 'SEND':
-            flag = 0
-            print 'From '+ addr[0]+ ' to '+ recv_info['targetip']+ ':'
+            print 'From '+addr[0]+':'+str(addr[1])+' to '+recv_info['targetip']+("" if str(recv_info['targetport'])=="" else ":"+str(recv_info['targetport']))+' :'
             print recv_info['info']
-            for i in range(0, len(addrs)):
-                if addrs[i][0] == recv_info['targetip']:
-                    send_msg(cons[i], addr[0], recv_info);
+            indexs = []
+            if str(recv_info['targetport'])=='':
+                for i in range(0, len(addrs)):
+                    if recv_info['targetip'] == addrs[i][0]:
+                        indexs.append(i);
+                if len(indexs) == 1:
+                    send_msg(cons[indexs[0]], addr, recv_info);
                     reply_ok(conn);
                     flag = 1
-                    break;
-            if flag == 0:
-                reply_offline(conn);
+                elif len(indexs) == 0:
+                    reply_offline(conn);
+                else:
+                    reply_multitarget(conn);
+            else:
+                for i in range(0, len(addrs)):
+                    if (recv_info['targetip'] == addrs[i][0] and recv_info['targetport'] == str(addrs[i][1])):
+                        indexs.append(i);
+                if len(indexs) == 1:
+                    send_msg(cons[indexs[0]], addr, recv_info);
+                    reply_ok(conn);
+                elif len(indexs) == 0:
+                    reply_offline(conn);
+            continue;
 
         elif recv_info['status'] == "GET":
             if recv_info['body'] == "get_user_list":
@@ -104,7 +126,7 @@ def handle_connection(conn, addr):
 
         elif recv_info['status'] == 'DISCONNECT':
             for i in range(0, len(addrs)):
-                if addrs[i][0] == addr[0]:
+                if addrs[i][0] == addr[0] and addrs[i][1] == addr[1]:
                     addrs.remove(addrs[i])
                     cons.remove(cons[i])
                     for i in range(0, len(cons)):
