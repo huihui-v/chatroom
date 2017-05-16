@@ -60,7 +60,8 @@ def handle_connection(conn, addr):
         recv_info = json.loads(recv_info)
         if recv_info['status'] == 'SEND':
             flag = 0
-            for i in addrs:
+            for i in range(0, len(addrs)):
+		print addrs[i][0]
                 if addrs[i][0] == recv_info['targetip']:
                     send_msg(cons[i], addr[0], recv_info);
                     print 'From ', addr[0], ' to ', recv_info['targetip'], ':'
@@ -85,7 +86,7 @@ def index():
     s = bind_socket()
     while 1:
         conn, addr = s.accept()
-        thread = threading.Thread(target=handle_connection, args=(conn, addr))
+        thread = threading.Thread(target=handle_connection, args=(conn, addr,))
         thread.start()
 
 index();
