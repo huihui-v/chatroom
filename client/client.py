@@ -42,7 +42,7 @@ def disconnect(s):
         s.close()
     print 'Disconnected!'
 
-def send_msg(target, msg):
+def send_msg(target, msg, s):
     new_info = info;
     new_info['status'] = "SEND"
     new_info['targetip'] = target
@@ -51,11 +51,11 @@ def send_msg(target, msg):
     s.sendall(in_json)
     recv_info = s.recv(1024)
     recv_info = json.loads(recv_info);
-    print recv_info
     if recv_info['status'] == 'OK':
         print 'Message sent!'
     elif recv_info['status'] == 'OFFLINE':
         print 'Error: Receiver Offline!'
+    return;
 
 def listen (s):
     while 1:
@@ -64,8 +64,12 @@ def listen (s):
         if recv_info['status'] == 'SEND':
             print 'Receive from ', recv_info['sourceip'], ':'
             print recv_info['info']
+            continue;
+
         else:
-            print recv
+            print recv_info
+            continue;
+
 
 def index ():
     s = connect_to_server()
@@ -78,7 +82,8 @@ def index ():
             break;
         elif (command[0] == 'send'):
             try:
-                send_msg(command[1], command[2])
+                send_msg(command[1], command[2], s)
+                continue;
             except Exception, e:
                 print Exception, ":", e
     return;
