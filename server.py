@@ -32,22 +32,22 @@ def bind_socket():
 
 def send_msg(conn, sourceip, msg):
     new_info = info
-    new_info.status = "SEND"
-    new_info.info = msg['info']
-    new_info.targetip = msg['targetip']
-    new_info.sourceip = sourceip
+    new_info['status'] = "SEND"
+    new_info['info'] = msg['info']
+    new_info['targetip'] = msg['targetip']
+    new_info['sourceip'] = sourceip
     in_json = json.dumps(new_info)
     conn.sendall(in_json)
 
 def reply_ok(conn):
     new_info = info
-    new_info.status = "OK"
+    new_info['status'] = "OK"
     in_json = json.dumps(new_info)
     conn.sendall(in_json)
 
 def reply_offline(conn):
     new_info = info
-    new_info.status = "OFFLINE"
+    new_info['status'] = "OFFLINE"
     in_json = json.dumps(new_info)
     conn.sendall(in_json)
 
